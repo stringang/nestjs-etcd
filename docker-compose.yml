@@ -1,12 +1,27 @@
 version: "3"
 
 services:
-  postgres:
-    image: postgres:11.7
-    environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
-      POSTGRES_DB: test
+  etcd:
+    image: quay.io/coreos/etcd:latest
     ports:
-      - "3306:5432"
+      - "2379:2379"
+      - "2380:2380"
+    environment:
+      NODE1: 127.0.0.1
+      DATA_DIR: etcd-data
+      ETCDCTL_API: 3
+    volumes:
+      - "etcd-data:/etcd-data"
+    container_name: etcd
+    command: >-
+      /usr/local/bin/etcd
+      --data-dir=/etcd-data
+      --name node1
+      --initial-advertise-peer-urls http://127.0.0.1:2380
+      --listen-peer-urls http://0.0.0.0:2380
+      --advertise-client-urls http://127.0.0.1:2379
+      --listen-client-urls http://0.0.0.0:2379
+      --initial-cluster node1=http://127.0.0.1:2380
     restart: always
+volumes:
+  etcd-data
