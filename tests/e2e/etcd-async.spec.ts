@@ -2,8 +2,9 @@ import { INestApplication } from '@nestjs/common';
 import { Server } from 'http';
 import { Test } from '@nestjs/testing';
 import { EtcdModule } from '../../lib';
-import { ConfigService } from '../src/config.service';
-import { ConfigModule } from '../src/config.module';
+import { ConfigService } from '../src/config/config.service';
+import { ConfigModule } from '../src/config/config.module';
+import { Etcd3 } from 'etcd3';
 
 describe('Etcd async configuration', () => {
   let app: INestApplication;
@@ -32,7 +33,20 @@ describe('Etcd async configuration', () => {
     expect(etcdModule).toBeDefined();
   });
 
-  afterEach(async () => {
+  it('should be get success', async function() {
+    const etcdClient = app.get(Etcd3);
+    etcdClient.mock({
+      exec: jest
+        .fn()
+        .mockResolvedValue({ kvs: [{ key: '/ad', value: 'async-test' }] }),
+    });
+    const result = await etcdClient.get('/ad').string();
+    expect(result).toBe('async-test');
+    etcdClient.unmock();
+  });
+
+  afterEach(async done => {
     await app.close();
+    done();
   });
 });

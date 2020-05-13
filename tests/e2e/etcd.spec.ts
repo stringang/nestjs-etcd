@@ -29,20 +29,20 @@ describe('Etcd module', () => {
     expect(etcdModule).toBeDefined();
   });
 
-  it('should be put success', async function() {
-    const etcdClient = app.get(Etcd3);
-    const result = await etcdClient.put('/ad').value('test');
-
-    expect(result).toBeDefined();
-  });
-
   it('should be get success', async function() {
     const etcdClient = app.get(Etcd3);
-    const result = await etcdClient.get('/ad');
+    etcdClient.mock({
+      exec: jest
+        .fn()
+        .mockResolvedValue({ kvs: [{ key: '/ad', value: 'test' }] }),
+    });
+    const result = await etcdClient.get('/ad').string();
     expect(result).toBe('test');
+    etcdClient.unmock();
   });
 
-  afterEach(async () => {
+  afterEach(async done => {
     await app.close();
+    done();
   });
 });
