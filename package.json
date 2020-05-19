@@ -44,7 +44,7 @@
     "rxjs-compat": "6.5.5",
     "supertest": "4.0.2",
     "ts-jest": "26.0.0",
-    "typescript": "3.9.2"
+    "typescript": "3.9.3"
   },
   "peerDependencies": {
     "@nestjs/common": "^6.7.0 || ^7.0.0",
